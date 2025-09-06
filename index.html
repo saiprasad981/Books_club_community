@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Book Club Community</title>
+  <style>
+    /* === Global Reset and Base Styles === */
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      margin: 0;
+      background: #f9f9f9;
+      color: #333;
+      line-height: 1.5;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+    body.dark-mode {
+      background: #121212;
+      color: #eee;
+    }
+    /* === Header === */
+    header {
+      background: linear-gradient(135deg, #2196F3, #0b72d9);
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+      position: relative;
+      user-select: none;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 900;
+    }
+    nav {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+    nav button {
+      background: #2196F3;
+      border: 2px solid white;
+      color: white;
+      font-weight: 600;
+      padding: 0.6rem 1.4rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    nav button:hover,
+    nav button:focus {
+      background: #0b72d9;
+      transform: scale(1.1);
+      outline: none;
+    }
+    nav button:disabled {
+      background: #666;
+      cursor: not-allowed;
+      transform: none;
+    }
+    /* === Top Right Controls === */
+    #top-right-controls {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      z-index: 1100;
+    }
+    #login-btn {
+      background: #2196F3;
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      padding: 0.6rem 1.2rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    #login-btn:hover,
+    #login-btn:focus {
+      background: #0b72d9;
+      box-shadow: 0 4px 10px rgba(33, 150, 243, 0.6);
+      outline: none;
+    }
+    #mode-toggle {
+      position: relative;
+      width: 50px;
+      height: 26px;
+      background: #bbb;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #mode-toggle.dark {
+      background: #2196F3;
+    }
+    #mode-toggle .toggle-circle {
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    #mode-toggle.dark .toggle-circle {
+      transform: translateX(24px);
+    }
+    /* === Main Layout === */
+    main {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    h2 {
+      color: #0b3c91;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    body.dark-mode h2 {
+      color: #aabbee;
+    }
+    /* === Genre List === */
+    #genre-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+      list-style: none;
+      padding: 0;
+    }
+    #genre-list li {
+      padding: 0.7rem 1.2rem;
+      border-radius: 25px;
+      background: #2196F3;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    #genre-list li.active,
+    #genre-list li:hover,
+    #genre-list li:focus {
+      background: #0b72d9;
+      transform: translateY(-4px);
+      outline: none;
+    }
+    body.dark-mode #genre-list li {
+      background: #333;
+      color: #bbb;
+    }
+    body.dark-mode #genre-list li.active,
+    body.dark-mode #genre-list li:hover {
+      background: #0b72d9;
+      color: white;
+    }
+    /* === Book List === */
+    #book-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.3rem;
+      margin-bottom: 3rem;
+    }
+    .book-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    body.dark-mode .book-card {
+      background: #222;
+      box-shadow: 0 6px 16px rgba(255,255,255,0.1);
+    }
+    .book-card:hover,
+    .book-card:focus {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(33,150,243,0.6);
+      outline: none;
+    }
+    .book-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+    .book-info {
+      padding: 1rem;
+      flex-grow: 1;
+    }
+    .book-title {
+      margin: 0 0 0.3rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0b3c91;
+    }
+    body.dark-mode .book-title {
+      color: #aabbee;
+    }
+    .book-author {
+      margin: 0 0 0.5rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    body.dark-mode .book-author {
+      color: #aaa;
+    }
+    .stars {
+      color: #f39c12;
+      font-weight: 700;
+    }
+    /* === Book Modal === */
+    #book-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 1000;
+    }
+    #book-modal.active {
+      display: flex;
+    }
+    #book-modal > div {
+      background: white;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      position: relative;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      animation: fadeInScale 0.3s ease forwards;
+    }
+    body.dark-mode #book-modal > div {
+      background: #222;
+      color: #eee;
+    }
+    @keyframes fadeInScale {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    #book-modal .close-btn {
+      position: absolute;
+      top: 0.7rem;
+      right: 1rem;
+      font-size: 2rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #666;
+      transition: color 0.3s ease;
+    }
+    #book-modal .close-btn:hover,
+    #book-modal .close-btn:focus {
+      color: #2196F3;
+      outline: none;
+    }
+    body.dark-mode #book-modal .close-btn {
+      color: #bbb;
+    }
+    #book-modal img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+    #book-modal h2 {
+      margin: 0 0 0.4rem;
+      font-weight: 700;
+      color: #0b3c91;
+    }
+    body.dark-mode #book-modal h2 {
+      color: #aabbee;
+    }
+    #book-modal .modal-info {
+      margin: 0.2rem 0 0.8rem;
+      font-weight: 600;
+      color: #555;
+    }
+    body.dark-mode #book-modal .modal-info {
+      color: #ccc;
+    }
+    #review-list {
+      max-height: 150px;
+      overflow-y: auto;
+      margin: 1rem 0;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+    }
+    body.dark-mode #review-list {
+      border-color: #444;
+    }
+    .review-item {
+      background: #f5faff;
+      border-radius: 8px;
+      padding: 0.5rem 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+    body.dark-mode .review-item {
+      background: #333;
+      color: #eee;
+    }
+    .review-item strong {
+      color: #0b72d9;
+    }
+    body.dark-mode .review-item strong {
+      color: #7abaff;
+    }
+    #review-form {
+      display: grid;
+      gap: 0.6rem;
+    }
+    #review-form input,
+    #review-form textarea,
+    #review-form select {
+      border-radius: 6px;
+      border: 1px solid #aaa;
+      padding: 0.6rem 0.8rem;
+      font-size: 1rem;
+      width: 100%;
+      resize: vertical;
+    }
+    body.dark-mode #review-form input,
+    body.dark-mode #review-form textarea,
+    body.dark-mode #review-form select {
+      background: #333;
+      border-color: #666;
+      color: #eee;
+    }
+    #review-form button {
+      background: #2196F3;
+      color: white;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      padding: 0.7rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    #review-form button:hover,
+    #review-form button:focus {
+      background: #0b72d9;
+      transform: scale(1.05);
+      outline: none;
+    }
+    /* === Groups Section === */
+    #groups-section {
+      margin-top: 3rem;
+    }
+    #group-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.3rem;
+    }
+    .group-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      padding: 1rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    body.dark-mode .group-card {
+      background: #222;
+      box-shadow: 0 6px 16px rgba(255,255,255,0.1);
+    }
+    .group-card:hover,
+    .group-card:focus-within {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.18);
+      outline: none;
+    }
+    .group-card h3 {
+      margin: 0 0 0.4rem;
+      color: #0b3c91;
+    }
+    body.dark-mode .group-card h3 {
+      color: #aabbee;
+    }
+    .group-card p {
+      margin: 0.15rem 0;
+      color: #555;
+    }
+    body.dark-mode .group-card p {
+      color: #ccc;
+    }
+    .group-card .group-buttons {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.8rem;
+    }
+    .group-card button {
+      padding: 0.5rem 1.3rem;
+      border-radius: 8px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .join-btn {
+      background: #2196F3;
+      color: white;
+    }
+    .join-btn:hover,
+    .join-btn:focus {
+      background: #0b72d9;
+      transform: scale(1.05);
+      outline: none;
+    }
+    .discuss-btn {
+      background: #555;
+      color: white;
+    }
+    .discuss-btn:hover,
+    .discuss-btn:focus {
+      background: #333;
+      transform: scale(1.05);
+      outline: none;
+    }
+    /* === Group Form === */
+    #group-form {
+      max-width: 400px;
+      margin: 2rem auto;
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+    #new-group-name {
+      flex-grow: 1;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #aaa;
+      font-size: 1rem;
+    }
+    body.dark-mode #new-group-name {
+      background: #333;
+      border-color: #666;
+      color: #eee;
+    }
+    #group-form button {
+      background: #2196F3;
+      color: white;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    #group-form button:hover,
+    #group-form button:focus {
+      background: #0b72d9;
+      transform: scale(1.05);
+      outline: none;
+    }
+    /* === Discussion Modal === */
+    #discussion-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 1100;
+    }
+    #discussion-modal.active {
+      display: flex;
+    }
+    #discussion-content {
+      background: white;
+      border-radius: 12px;
+      max-width: 650px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    }
+    body.dark-mode #discussion-content {
+      background: #222;
+      color: #eee;
+    }
+    #discussion-header {
+      background: #2196F3;
+      color: white;
+      padding: 1rem 1.5rem;
+      font-weight: 700;
+      font-size: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #discussion-close {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.6rem;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    #discussion-close:hover,
+    #discussion-close:focus {
+      color: #ddd;
+      outline: none;
+    }
+    #discussion-messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1rem 1.5rem;
+      background: #f9fbff;
+    }
+    body.dark-mode #discussion-messages {
+      background: #333;
+    }
+    .discussion-message {
+      margin-bottom: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      background: #dbe9ff;
+      max-width: 80%;
+    }
+    body.dark-mode .discussion-message {
+      background: #444;
+    }
+    .discussion-message strong {
+      display: block;
+      margin-bottom: 0.3rem;
+      color: #0b72d9;
+    }
+    body.dark-mode .discussion-message strong {
+      color: #7abaff;
+    }
+    #discussion-form {
+      border-top: 1px solid #ddd;
+      display: flex;
+      padding: 1rem 1.5rem;
+      background: #f0f4ff;
+    }
+    body.dark-mode #discussion-form {
+      border-color: #444;
+      background: #222;
+    }
+    #discussion-input {
+      flex-grow: 1;
+      border: 1px solid #aaa;
+      border-radius: 20px;
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+    }
+    body.dark-mode #discussion-input {
+      background: #333;
+      border-color: #666;
+      color: #eee;
+    }
+    #discussion-send {
+      background: #2196F3;
+      border: none;
+      color: white;
+      font-weight: 700;
+      margin-left: 0.8rem;
+      padding: 0.6rem 1.4rem;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    #discussion-send:hover,
+    #discussion-send:focus {
+      background: #0b72d9;
+      transform: scale(1.1);
+      outline: none;
+    }
+    /* === Login Modal === */
+    #login-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      z-index: 1200;
+    }
+    #login-modal.active {
+      display: flex;
+    }
+    #login-modal > div {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    body.dark-mode #login-modal > div {
+      background: #222;
+      color: #eee;
+    }
+    #login-modal h2 {
+      margin: 0 0 1.5rem;
+      font-weight: 800;
+      font-size: 1.8rem;
+      color: #0b3c91;
+    }
+    body.dark-mode #login-modal h2 {
+      color: #aabbee;
+    }
+    #login-modal label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    #login-modal input {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      margin-bottom: 1.2rem;
+      font-size: 1rem;
+      border: 1.5px solid #ccc;
+      border-radius: 8px;
+      transition: border-color 0.3s ease, background-color 0.3s ease;
+    }
+    #login-modal input:focus {
+      border-color: #2196F3;
+      background: #eaf4ff;
+      outline: none;
+    }
+    body.dark-mode #login-modal input {
+      background: #333;
+      border-color: #555;
+      color: #eee;
+    }
+    body.dark-mode #login-modal input:focus {
+      background: #29487d;
+      border-color: #2196F3;
+    }
+    #login-modal .forgot-password {
+      display: block;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      color: #2196F3;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    #login-modal .forgot-password:hover,
+    #login-modal .forgot-password:focus {
+      color: #0b72d9;
+      outline: none;
+    }
+    #login-modal .submit-btn {
+      background: #2196F3;
+      color: white;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      width: 100%;
+      padding: 0.7rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    #login-modal .submit-btn:hover,
+    #login-modal .submit-btn:focus {
+      background: #0b72d9;
+      box-shadow: 0 6px 15px rgba(33,150,243,0.6);
+      outline: none;
+    }
+    #login-modal .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 1.8rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #666;
+      transition: color 0.3s ease;
+    }
+    #login-modal .close-btn:hover,
+    #login-modal .close-btn:focus {
+      color: #2196F3;
+      outline: none;
+    }
+    body.dark-mode #login-modal .close-btn {
+      color: #bbb;
+    }
+    /* === Footer === */
+    footer {
+      background: #111;
+      color: #ccc;
+      text-align: center;
+      padding: 1.5rem 1rem;
+      font-size: 0.9rem;
+    }
+    /* === Responsive Design === */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 2rem;
+      }
+      #book-list {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      }
+      .book-card img {
+        height: 180px;
+      }
+      #group-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Book Club Community</h1>
+    <nav aria-label="Main navigation">
+      <button type="button" id="btn-books" disabled>Books</button>
+      <button type="button" id="btn-clubs">Book Clubs</button>
+    </nav>
+  </header>
+  <div id="top-right-controls" role="region" aria-label="User controls">
+    <button id="login-btn" aria-haspopup="dialog" aria-controls="login-modal" aria-expanded="false">Login</button>
+    <button id="mode-toggle" role="switch" aria-checked="false" aria-label="Toggle dark/light mode">
+      <span class="toggle-circle"></span>
+    </button>
+  </div>
+  <main>
+    <section id="books-section" aria-label="Browse books">
+      <h2>Browse Books</h2>
+      <ul id="genre-list" role="list" aria-label="Book genres"></ul>
+      <div id="book-list" role="list" aria-live="polite"></div>
+    </section>
+    <section id="groups-section" style="display:none;" aria-label="Book clubs">
+      <h2>Book Clubs</h2>
+      <div id="group-list" role="list"></div>
+      <form id="group-form" aria-label="Create new book club">
+        <input type="text" id="new-group-name" placeholder="New club name" aria-required="true" />
+        <button type="submit">Create Club</button>
+      </form>
+    </section>
+  </main>
+  <div id="book-modal" role="dialog" aria-modal="true" aria-labelledby="modal-book-title" tabindex="-1">
+    <div>
+      <button class="close-btn" aria-label="Close book details">&times;</button>
+      <img src="" alt="" id="modal-book-image" />
+      <h2 id="modal-book-title"></h2>
+      <p class="modal-info" id="modal-book-author"></p>
+      <p class="modal-info" id="modal-book-genre"></p>
+      <p class="modal-info" id="modal-book-rating"></p>
+      <p id="modal-book-description"></p>
+      <h4>User Reviews</h4>
+      <div id="review-list" aria-live="polite"></div>
+      <form id="review-form" aria-label="Add a review">
+        <input type="text" id="review-user" placeholder="Your Name" required />
+        <select id="review-rating" aria-label="Rating" required>
+          <option value="" disabled selected>Rating</option>
+          <option value="5">★★★★★</option>
+          <option value="4">★★★★</option>
+          <option value="3">★★★</option>
+          <option value="2">★★</option>
+          <option value="1">★</option>
+        </select>
+        <textarea id="review-text" placeholder="Your review" rows="3" required></textarea>
+        <button type="submit">Add Review</button>
+      </form>
+    </div>
+  </div>
+  <div id="discussion-modal" role="dialog" aria-modal="true" aria-labelledby="discussion-title">
+    <div id="discussion-content">
+      <div id="discussion-header">
+        <span id="discussion-title"></span>
+        <button id="discussion-close" aria-label="Close discussion">&times;</button>
+      </div>
+      <div id="discussion-messages" tabindex="0" aria-live="polite"></div>
+      <form id="discussion-form" aria-label="Add a message">
+        <input type="text" id="discussion-input" placeholder="Type your message..." required autocomplete="off" />
+        <button id="discussion-send" type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+  <div id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-modal-title" tabindex="-1">
+    <div>
+      <button class="close-btn" aria-label="Close login form">&times;</button>
+      <h2 id="login-modal-title">Login</h2>
+      <form id="login-form" autocomplete="off" novalidate>
+        <label for="email-input">Email</label>
+        <input type="email" id="email-input" name="email" required placeholder="you@example.com" autocomplete="email" />
+        <label for="password-input">Password</label>
+        <input type="password" id="password-input" name="password" required placeholder="Enter your password" autocomplete="current-password" />
+        <a href="#" class="forgot-password" tabindex="0">Forgot Password?</a>
+        <button type="submit" class="submit-btn">Submit</button>
+      </form>
+    </div>
+  </div>
+  <footer>
+    &copy; 2025 Book Club Community. All rights reserved.
+  </footer>
+  <script>
+    (function () {
+      // Sample Data
+      const books = [
+        {
+          id: 1,
+          title: "The Great Gatsby",
+          author: "F. Scott Fitzgerald",
+          genre: "Classic",
+          rating: 4.3,
+          image: "https://tse4.mm.bing.net/th/id/OIP.m0JVgIhbT3uOI0GlVaV3WgHaMO?pid=Api&P=0&h=180",
+          description: "A classic novel of the Jazz Age, exploring themes of decadence, idealism, and excess.",
+          reviews: [
+            { user: "Anna", rating: 5, text: "A timeless classic, beautifully written." },
+            { user: "Mark", rating: 4, text: "Loved the characters and story." },
+          ],
+        },
+        {
+          id: 2,
+          title: "Sapiens",
+          author: "Yuval Noah Harari",
+          genre: "Non-Fiction",
+          rating: 4.7,
+          image: "https://tse2.mm.bing.net/th/id/OIP.7lssVoFgM2riZlSGMojWUAHaLX?pid=Api&P=0&h=180",
+          description: "A brief history of humankind, covering the cognitive, agricultural, and scientific revolutions.",
+          reviews: [
+            { user: "John", rating: 5, text: "Incredibly insightful and well-written." },
+          ],
+        },
+        {
+          id: 3,
+          title: "1984",
+          author: "George Orwell",
+          genre: "Dystopian",
+          rating: 4.6,
+          image: "https://images.unsplash.com/photo-1534081333815-ae5019106622?auto=format&fit=crop&w=400&q=80",
+          description: "A dystopian novel about totalitarianism and surveillance.",
+          reviews: [
+            { user: "Emily", rating: 4, text: "A chilling and thought-provoking read." },
+          ],
+        },
+        {
+          id: 4,
+          title: "The Hobbit",
+          author: "J.R.R. Tolkien",
+          genre: "Fantasy",
+          rating: 4.8,
+          image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=400&q=80",
+          description: "Bilbo Baggins embarks on an epic quest filled with dragons, treasure, and adventure.",
+          reviews: [
+            { user: "Mike", rating: 5, text: "An absolute fantasy masterpiece!" },
+          ],
+        },
+        {
+          id: 5,
+          title: "1776",
+          author: "David McCullough",
+          genre: "History",
+          rating: 4.1,
+          image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=400&q=80",
+          description: "A detailed account of the American Revolution’s pivotal year.",
+          reviews: [
+            { user: "Lucy", rating: 4, text: "Very detailed and engaging." },
+          ],
+        },
+      ];
+      const groups = [
+        {
+          id: 1,
+          name: "Classic Lovers",
+          description: "Discuss and enjoy classic literature with fellow readers.",
+          members: 14,
+          joined: false,
+          discussions: [
+            { user: "Anna", message: "Just finished 'Pride and Prejudice'. Anyone else?" },
+            { user: "You", message: "Loved the character development in that book!" },
+          ],
+        },
+        {
+          id: 2,
+          name: "Dystopian Readers",
+          description: "For fans of dystopian novels like 1984 and Brave New World.",
+          members: 20,
+          joined: false,
+          discussions: [
+            { user: "John", message: "1984's themes are so relevant today." },
+            { user: "You", message: "Agreed, it's a chilling masterpiece." },
+          ],
+        },
+      ];
+      // State
+      let currentGenre = "All";
+      let currentBook = null;
+      let currentGroup = null;
+      let isLoggedIn = false;
+      // Elements
+      const genreList = document.getElementById("genre-list");
+      const bookList = document.getElementById("book-list");
+      const bookModal = document.getElementById("book-modal");
+      const modalCloseBtn = bookModal.querySelector(".close-btn");
+      const modalBookTitle = document.getElementById("modal-book-title");
+      const modalBookAuthor = document.getElementById("modal-book-author");
+      const modalBookGenre = document.getElementById("modal-book-genre");
+      const modalBookRating = document.getElementById("modal-book-rating");
+      const modalBookDescription = document.getElementById("modal-book-description");
+      const modalBookImage = document.getElementById("modal-book-image");
+      const reviewList = document.getElementById("review-list");
+      const reviewForm = document.getElementById("review-form");
+      const reviewUser = document.getElementById("review-user");
+      const reviewRating = document.getElementById("review-rating");
+      const reviewText = document.getElementById("review-text");
+      const groupsSection = document.getElementById("groups-section");
+      const groupList = document.getElementById("group-list");
+      const groupForm = document.getElementById("group-form");
+      const newGroupName = document.getElementById("new-group-name");
+      const booksSection = document.getElementById("books-section");
+      const btnBooks = document.getElementById("btn-books");
+      const btnClubs = document.getElementById("btn-clubs");
+      const loginBtn = document.getElementById("login-btn");
+      const loginModal = document.getElementById("login-modal");
+      const loginCloseBtn = loginModal.querySelector(".close-btn");
+      const loginForm = document.getElementById("login-form");
+      const forgotPasswordLink = loginModal.querySelector(".forgot-password");
+      const discussionModal = document.getElementById("discussion-modal");
+      const discussionTitle = document.getElementById("discussion-title");
+      const discussionClose = document.getElementById("discussion-close");
+      const discussionMessages = document.getElementById("discussion-messages");
+      const discussionForm = document.getElementById("discussion-form");
+      const discussionInput = document.getElementById("discussion-input");
+      const modeToggle = document.getElementById("mode-toggle");
+      // Utility: Get unique genres
+      function getGenres() {
+        const genres = new Set(books.map(book => book.genre));
+        return ["All", ...genres];
+      }
+      // Render genres
+      function renderGenres() {
+        genreList.innerHTML = "";
+        getGenres().forEach(genre => {
+          const li = document.createElement("li");
+          li.textContent = genre;
+          li.setAttribute("data-genre", genre);
+          li.setAttribute("tabindex", "0");
+          li.setAttribute("role", "button");
+          li.setAttribute("aria-pressed", genre === currentGenre);
+          if (genre === currentGenre) li.classList.add("active");
+          li.addEventListener("click", () => setActiveGenre(genre));
+          li.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setActiveGenre(genre);
+            }
+          });
+          genreList.appendChild(li);
+        });
+      }
+      // Set active genre
+      function setActiveGenre(genre) {
+        currentGenre = genre;
+        Array.from(genreList.children).forEach(li => {
+          li.classList.toggle("active", li.dataset.genre === genre);
+          li.setAttribute("aria-pressed", li.dataset.genre === genre);
+        });
+        renderBooks();
+      }
+      // Render books
+      function renderBooks() {
+        bookList.innerHTML = "";
+        const filteredBooks = currentGenre === "All" ? books : books.filter(b => b.genre === currentGenre);
+        if (filteredBooks.length === 0) {
+          bookList.innerHTML = `<p style="grid-column: 1/-1; text-align: center;">No books available for "${currentGenre}"</p>`;
+          return;
+        }
+        filteredBooks.forEach(book => {
+          const card = document.createElement("article");
+          card.className = "book-card";
+          card.setAttribute("tabindex", "0");
+          card.setAttribute("role", "button");
+          card.setAttribute("aria-label", `Open details for ${book.title} by ${book.author}`);
+          card.innerHTML = `
+            <img src="${book.image}" alt="Cover image of ${book.title}" loading="lazy" />
+            <div class="book-info">
+              <h3 class="book-title">${book.title}</h3>
+              <p class="book-author">${book.author}</p>
+              <div class="stars" aria-label="Rating: ${book.rating} stars">${"★".repeat(Math.floor(book.rating))}${book.rating % 1 >= 0.5 ? "½" : ""}</div>
+            </div>
+          `;
+          card.addEventListener("click", () => openBookModal(book.id));
+          card.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openBookModal(book.id);
+            }
+          });
+          bookList.appendChild(card);
+        });
+      }
+      // Open book modal
+      function openBookModal(bookId) {
+        currentBook = books.find(b => b.id === bookId);
+        if (!currentBook) return;
+        modalBookTitle.textContent = currentBook.title;
+  modalBookAuthor.textContent = `Author: ${currentBook.author}`;
+  modalBookGenre.textContent = `Genre: ${currentBook.genre}`;
+  modalBookRating.textContent = `Rating: ${currentBook.rating.toFixed(1)}`;
+        modalBookDescription.textContent = currentBook.description;
+        modalBookImage.src = currentBook.image;
+  modalBookImage.alt = `Cover image of ${currentBook.title}`;
+        renderReviews();
+        bookModal.classList.add("active");
+        bookModal.focus();
+        document.body.style.overflow = "hidden";
+      }
+      // Close book modal
+      function closeBookModal() {
+        bookModal.classList.remove("active");
+        document.body.style.overflow = "";
+        currentBook = null;
+      }
+      modalCloseBtn.addEventListener("click", closeBookModal);
+      bookModal.addEventListener("click", e => {
+        if (e.target === bookModal) closeBookModal();
+      });
+      // Render reviews
+      function renderReviews() {
+        reviewList.innerHTML = "";
+        if (!currentBook) return;
+        currentBook.reviews.forEach(review => {
+          const div = document.createElement("div");
+          div.className = "review-item";
+          div.innerHTML = `<strong>${review.user}</strong> (${review.rating}★): ${review.text}`;
+          reviewList.appendChild(div);
+        });
+      }
+      // Add review
+      reviewForm.addEventListener("submit", e => {
+        e.preventDefault();
+        if (!currentBook || !isLoggedIn) {
+          alert("Please log in to add a review.");
+          return;
+        }
+        const user = reviewUser.value.trim();
+        const rating = parseInt(reviewRating.value);
+        const text = reviewText.value.trim();
+        if (user && rating && text) {
+          currentBook.reviews.push({ user, rating, text });
+          renderReviews();
+          reviewForm.reset();
+        }
+      });
+      // Render groups
+      function renderGroups() {
+        groupList.innerHTML = "";
+        groups.forEach(group => {
+          const card = document.createElement("article");
+          card.className = "group-card";
+          card.setAttribute("tabindex", "0");
+          card.setAttribute("role", "listitem");
+          card.setAttribute("aria-label", `Book club: ${group.name}, ${group.members} members`);
+          card.innerHTML = `
+            <h3>${group.name}</h3>
+            <p>${group.description}</p>
+            <p>Members: ${group.members}</p>
+            <div class="group-buttons">
+              <button class="join-btn" aria-pressed="${group.joined}">${group.joined ? "Leave" : "Join"}</button>
+              <button class="discuss-btn">Discussion</button>
+            </div>
+          `;
+          const joinBtn = card.querySelector(".join-btn");
+          const discussBtn = card.querySelector(".discuss-btn");
+          joinBtn.addEventListener("click", () => toggleJoinGroup(group.id));
+          discussBtn.addEventListener("click", () => openDiscussion(group.id));
+          groupList.appendChild(card);
+        });
+      }
+      // Toggle join/leave group
+      function toggleJoinGroup(groupId) {
+        if (!isLoggedIn) {
+          alert("Please log in to join a group.");
+          return;
+        }
+        const group = groups.find(g => g.id === groupId);
+        if (!group) return;
+        group.joined = !group.joined;
+        group.members += group.joined ? 1 : -1;
+        renderGroups();
+      }
+      // Create new group
+      groupForm.addEventListener("submit", e => {
+        e.preventDefault();
+        if (!isLoggedIn) {
+          alert("Please log in to create a group.");
+          return;
+        }
+        const name = newGroupName.value.trim();
+        if (name) {
+          groups.push({
+            id: Date.now(),
+            name,
+            description: "Newly created book club",
+            members: 1,
+            joined: true,
+            discussions: [],
+          });
+          newGroupName.value = "";
+          renderGroups();
+        }
+      });
+      // Open discussion modal
+      function openDiscussion(groupId) {
+        if (!isLoggedIn) {
+          alert("Please log in to participate in discussions.");
+          return;
+        }
+        currentGroup = groups.find(g => g.id === groupId);
+        if (!currentGroup) return;
+  discussionTitle.textContent = `Discussion - ${currentGroup.name}`;
+        discussionMessages.innerHTML = "";
+        currentGroup.discussions.forEach(disc => {
+          addDiscussionMessage(disc.user, disc.message);
+        });
+        discussionModal.classList.add("active");
+        discussionInput.focus();
+        document.body.style.overflow = "hidden";
+      }
+      // Close discussion modal
+      function closeDiscussion() {
+        discussionModal.classList.remove("active");
+        discussionInput.value = "";
+        document.body.style.overflow = "";
+        currentGroup = null;
+      }
+      discussionClose.addEventListener("click", closeDiscussion);
+      discussionModal.addEventListener("click", e => {
+        if (e.target === discussionModal) closeDiscussion();
+      });
+      // Add discussion message
+      function addDiscussionMessage(user, message) {
+        const div = document.createElement("div");
+        div.className = "discussion-message";
+  div.innerHTML = `<strong>${user}:</strong> ${message}`;
+        discussionMessages.appendChild(div);
+        discussionMessages.scrollTop = discussionMessages.scrollHeight;
+      }
+      // Discussion form submit
+      discussionForm.addEventListener("submit", e => {
+        e.preventDefault();
+        if (!currentGroup) return;
+        const msg = discussionInput.value.trim();
+        if (msg) {
+          currentGroup.discussions.push({ user: "You", message: msg });
+          addDiscussionMessage("You", msg);
+          discussionInput.value = "";
+          discussionInput.focus();
+        }
+      });
+      // Toggle sections
+      btnBooks.addEventListener("click", () => {
+        booksSection.style.display = "block";
+        groupsSection.style.display = "none";
+        btnBooks.disabled = true;
+        btnClubs.disabled = false;
+      });
+      btnClubs.addEventListener("click", () => {
+        booksSection.style.display = "none";
+        groupsSection.style.display = "block";
+        btnBooks.disabled = false;
+        btnClubs.disabled = true;
+        renderGroups();
+      });
+      // Dark mode toggle
+      function initMode() {
+        const savedMode = localStorage.getItem("mode");
+        if (savedMode) {
+          if (savedMode === "dark") {
+            document.body.classList.add("dark-mode");
+            modeToggle.classList.add("dark");
+            modeToggle.setAttribute("aria-checked", "true");
+          } else {
+            modeToggle.setAttribute("aria-checked", "false");
+          }
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          document.body.classList.add("dark-mode");
+          modeToggle.classList.add("dark");
+          modeToggle.setAttribute("aria-checked", "true");
+        }
+      }
+      function toggleMode() {
+        const isDark = document.body.classList.toggle("dark-mode");
+        modeToggle.classList.toggle("dark", isDark);
+        modeToggle.setAttribute("aria-checked", isDark);
+        localStorage.setItem("mode", isDark ? "dark" : "light");
+      }
+      modeToggle.addEventListener("click", toggleMode);
+      modeToggle.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleMode();
+        }
+      });
+      // Login modal handling
+      function openLoginModal() {
+        loginModal.classList.add("active");
+        loginModal.setAttribute("aria-hidden", "false");
+        loginBtn.setAttribute("aria-expanded", "true");
+        loginModal.querySelector("input[type='email']").focus();
+      }
+      function closeLoginModal() {
+        loginModal.classList.remove("active");
+        loginModal.setAttribute("aria-hidden", "true");
+        loginBtn.setAttribute("aria-expanded", "false");
+        loginBtn.focus();
+      }
+      loginBtn.addEventListener("click", openLoginModal);
+      loginBtn.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openLoginModal();
+        }
+      });
+      loginCloseBtn.addEventListener("click", closeLoginModal);
+      loginModal.addEventListener("click", e => {
+        if (e.target === loginModal) closeLoginModal();
+      });
+      forgotPasswordLink.addEventListener("click", e => {
+        e.preventDefault();
+        alert("Forgot password feature coming soon!");
+      });
+      loginForm.addEventListener("submit", e => {
+        e.preventDefault();
+        const email = loginForm.email.value.trim();
+        const password = loginForm.password.value.trim();
+        if (!email || !password) {
+          alert("Please fill in both email and password.");
+          return;
+        }
+        isLoggedIn = true;
+        loginBtn.textContent = "Logout";
+  alert(`Logged in as ${email}`);
+        loginForm.reset();
+        closeLoginModal();
+      });
+      loginBtn.addEventListener("click", () => {
+        if (isLoggedIn) {
+          isLoggedIn = false;
+          loginBtn.textContent = "Login";
+          alert("Logged out successfully.");
+        } else {
+          openLoginModal();
+        }
+      });
+      // Close modals on ESC
+      document.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+          if (bookModal.classList.contains("active")) closeBookModal();
+          if (discussionModal.classList.contains("active")) closeDiscussion();
+          if (loginModal.classList.contains("active")) closeLoginModal();
+        }
+      });
+      // Initialize
+      initMode();
+      renderGenres();
+      renderBooks();
+    })();
+  </script>
+</body>
+</html>
